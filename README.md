@@ -6,7 +6,7 @@
 - pytest
 - selenium
 - requests
-- _sqlalchemy_
+- sqlalchemy
 - allure
 - config
 
