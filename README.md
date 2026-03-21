@@ -6,28 +6,28 @@
 - pytest
 - selenium
 - requests
-- sqlalchemy
 - allure
 - config
 
 ### Струткура:
 - ./test - тесты
 - ./pages - описание страниц
-- ./api - хелперы для работы с API
-- ./db - хелперы для работы с БД
 
 ### Полезные ссылки
 - [Подсказка по markdown](https://www.markdownguide.org/basic-syntax/)
 
 ### Шаги
 1. Склонировать проект 'git clone https://github.com/evgenlev19811212/Python-final-project.git'
-2. Установить зависимости
+2. Установить зависимости 'pip install -r requirements.txt'
 3. Запустить тесты 'pytest'
+4. Запустить тесты 'pytest -m "api"'
+5. Запустить тесты 'pytest -m "ui"'
+6. Запустить тесты 'pytest --alluredir allure-result'
+7. Ознакомиться с отчётом 'allure serve allure-result'
 
 ### Библиотеки (!)
-- pyp install pytest
+- pip install pytest
 - pip install selenium
 - pip install webdriver-manager
 - pip install requests
-- pip install sqlalchemy
 - pip install allure-pytest
