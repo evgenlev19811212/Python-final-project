@@ -112,6 +112,13 @@ class apiYouGile:
         resp = requests.get(f"{self.url}/api-v2/projects/{project_Id}", headers=headers) # noqa
         return resp
 
+    def get_project_list(self, API_key: str) -> int:
+        headers = {
+                    "Authorization": f"Bearer {API_key}"
+                    }
+        resp = requests.get(f"{self.url}/api-v2/projects/", headers=headers)
+        return len(resp.json()["content"])
+
     @allure.step("Удаление проекта по его id")
     def delete_project(self, API_key: str, project_Id: str) -> str:
         """
