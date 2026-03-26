@@ -67,12 +67,11 @@ class MainPage:
                         ).click()
 
     @allure.step("Ввод названия проекта")
-    def create_project_title(self, title: str = "New Project") -> None:
+    def create_project_title(self, title: str) -> None:
         """
         Очищает поле ввода и вводит название проекта.
 
-        :param title: str — название проекта. По умолчанию задано
-        "New Project", но можно задать своё при вызове метода.
+        :param title: str — название проекта.
         """
         self.driver.find_element(By.CSS_SELECTOR,
                                  '[placeholder="Введите название проекта…"]'
@@ -105,40 +104,73 @@ class MainPage:
             (By.CSS_SELECTOR, '[class="flex flex-row flex-wrap gap-16"]>div')))
         return len(proj_list) - 1
 
-    def edit_project(self, title: str = "Newest Project") -> None:
-        css = '[class="flex-none h-16 w-16 flex items-center justify-center"]'
-        self.driver.find_element(By.CSS_SELECTOR, css).click()
-        self.wait.until(EC.element_to_be_clickable(
-                        (By.XPATH, "//div[text()='Переименовать']"))
-                        ).click()
-        self.wait.until(EC.text_to_be_present_in_element(
-                        (By.XPATH, "//div[text()='Редактировать описание']"))
-                        ).clear()
-        self.driver.find_element(
-            (By.XPATH, "//div[text()='Редактировать описание']")
-            ).send_keys(title, Keys.ENTER)
+    @allure.step("Переименование проекта")
+    def edit_project(self, title: str, new_title: str) -> None:
+        cards = self.wait.until(EC.presence_of_all_elements_located((
+            By.CSS_SELECTOR, '[data-testid="project-title"]')))
+        for card in cards:
+            if title in card.text:
+                css = '[class="flex-none h-16 w-16 flex items-center justify-center"]' # noqa
+                self.wait.until(EC.element_to_be_clickable((
+                    By.CSS_SELECTOR, css))).click()
+                self.wait.until(EC.element_to_be_clickable(
+                        (By.XPATH, "//div[text()='Переименовать']"))).click()
+                xpath = '//input[@placeholder="Введите название проекта…"]'
+                project_title = self.wait.until(
+                    EC.presence_of_element_located(
+                        (By.XPATH, xpath)))
+                project_title.send_keys(Keys.BACKSPACE * 20)
+                project_title.send_keys(new_title, Keys.ENTER)
+            break
 
     @allure.step("Удаление проекта")
-    def delete_project(self) -> None:
+    def delete_project(self, title: str = None, new_title: str = None) -> None:
         """
         Удаляет созданный для теста проект.
+        :param title: str — название проекта.
+        :param new_title: str — название проекта.
         """
-        css = '[class="flex-none h-16 w-16 flex items-center justify-center"]'
-        self.driver.find_element(By.CSS_SELECTOR, css).click()
-        self.wait.until(EC.element_to_be_clickable(
+        cards = self.wait.until(EC.presence_of_all_elements_located((
+            By.CSS_SELECTOR, '[data-testid="project-title"]')))
+        if title is not None:
+            for card in cards:
+                if title in card.text:
+                    css = '[class="flex-none h-16 w-16 flex items-center justify-center"]' # noqa
+                    self.driver.find_element(By.CSS_SELECTOR, css).click()
+                    self.wait.until(EC.element_to_be_clickable(
                         (By.XPATH, "//div[text()='Удалить']"))).click()
-        css = '[class="flex bg-action-attention-default text-invert px-16 py-12 plain-text-semibold hover:bg-action-attention-hover active:bg-action-attention-pressed rounded-8 w-fit cursor-pointer select-none"]' # noqa
-        self.wait.until(EC.element_to_be_clickable(
+                    css = '[class="flex bg-action-attention-default text-invert px-16 py-12 plain-text-semibold hover:bg-action-attention-hover active:bg-action-attention-pressed rounded-8 w-fit cursor-pointer select-none"]' # noqa
+                    self.wait.until(EC.element_to_be_clickable(
                         (By.CSS_SELECTOR, css))).click()
+                else:
+                    continue
+        if new_title is not None:
+            for card in cards:
+                if new_title in card.text:
+                    css = '[class="flex-none h-16 w-16 flex items-center justify-center"]' # noqa
+                    self.driver.find_element(By.CSS_SELECTOR, css).click()
+                    self.wait.until(EC.element_to_be_clickable(
+                        (By.XPATH, "//div[text()='Удалить']"))).click()
+                    css = '[class="flex bg-action-attention-default text-invert px-16 py-12 plain-text-semibold hover:bg-action-attention-hover active:bg-action-attention-pressed rounded-8 w-fit cursor-pointer select-none"]' # noqa
+                    self.wait.until(EC.element_to_be_clickable(
+                        (By.CSS_SELECTOR, css))).click()
+                else:
+                    continue
 
     @allure.step("Дублирование проекта")
-    def double_project(self) -> None:
+    def double_project(self, title: str) -> None:
         """
         Дублирует созданный для теста проект.
+        :param title: str — название проекта.
         """
-        css = '[class="flex-none h-16 w-16 flex items-center justify-center"]'
-        self.driver.find_element(By.CSS_SELECTOR, css).click()
-        self.wait.until(EC.element_to_be_clickable(
+        cards = self.wait.until(EC.presence_of_all_elements_located((
+            By.CSS_SELECTOR, '[data-testid="project-title"]')))
+        for card in cards:
+            if title in card.text:
+                css = '[class="flex-none h-16 w-16 flex items-center justify-center"]' # noqa
+                self.driver.find_element(By.CSS_SELECTOR, css).click()
+                self.wait.until(EC.element_to_be_clickable(
                         (By.XPATH, "//div[text()='Дублировать']"))).click()
-        self.wait.until(EC.element_to_be_clickable(
+                self.wait.until(EC.element_to_be_clickable(
                         (By.XPATH, "//span[text()='Ok']"))).click()
+                break
