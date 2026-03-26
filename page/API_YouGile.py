@@ -112,6 +112,7 @@ class apiYouGile:
         resp = requests.get(f"{self.url}/api-v2/projects/{project_Id}", headers=headers) # noqa
         return resp
 
+    @allure.step("Количество проектов компании")
     def get_project_list(self, API_key: str) -> int:
         headers = {
                     "Authorization": f"Bearer {API_key}"

@@ -80,6 +80,20 @@ class MainPage:
                                  '[placeholder="Введите название проекта…"]'
                                  ).send_keys(title)
 
+    def is_create_project_button_active(self) -> bool:
+        """
+        Проверяет, активна ли кнопка добавления проекта с помощью EC.
+
+        return bool: True если кнопка активна, False если неактивна
+        """
+        try:
+            self.wait.until(EC.element_to_be_clickable((
+                By.XPATH, "//div[text()='Добавить проект с задачами']"))
+                ).click()
+            return True
+        except Exception:
+            return False
+
     @allure.step("Нажатие кнопки добавления проекта")
     def create_project_click_button(self) -> None:
         """
@@ -101,8 +115,8 @@ class MainPage:
 
     def len_proj_list(self) -> int:
         proj_list = self.wait.until(EC.visibility_of_all_elements_located(
-            (By.CSS_SELECTOR, '[class="flex flex-row flex-wrap gap-16"]>div')))
-        return len(proj_list) - 1
+            (By.CSS_SELECTOR, '[data-testid="project-title"]')))
+        return len(proj_list)
 
     @allure.step("Переименование проекта")
     def edit_project(self, title: str, new_title: str) -> None:
@@ -142,8 +156,7 @@ class MainPage:
                     css = '[class="flex bg-action-attention-default text-invert px-16 py-12 plain-text-semibold hover:bg-action-attention-hover active:bg-action-attention-pressed rounded-8 w-fit cursor-pointer select-none"]' # noqa
                     self.wait.until(EC.element_to_be_clickable(
                         (By.CSS_SELECTOR, css))).click()
-                else:
-                    continue
+
         if new_title is not None:
             for card in cards:
                 if new_title in card.text:
@@ -154,8 +167,6 @@ class MainPage:
                     css = '[class="flex bg-action-attention-default text-invert px-16 py-12 plain-text-semibold hover:bg-action-attention-hover active:bg-action-attention-pressed rounded-8 w-fit cursor-pointer select-none"]' # noqa
                     self.wait.until(EC.element_to_be_clickable(
                         (By.CSS_SELECTOR, css))).click()
-                else:
-                    continue
 
     @allure.step("Дублирование проекта")
     def double_project(self, title: str) -> None:

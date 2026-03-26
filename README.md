@@ -7,11 +7,10 @@
 - selenium
 - requests
 - allure
-- config
 
 ### Струткура:
 - ./test - тесты
-- ./pages - описание страниц
+- ./page - описание страниц
 
 ### Полезные ссылки
 - [Подсказка по markdown](https://www.markdownguide.org/basic-syntax/)
