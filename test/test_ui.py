@@ -19,7 +19,7 @@ def test_create_project_positive(auth, API_key, driver):
     title = "New Project"
 
     with allure.step("Количество проектов до начала теста"):
-        project_list_before = main.len_proj_list()
+        project_list_before = api.get_project_list(API_key)
 
     with allure.step("Создание нового проекта через UI"):
         main.create_project_click()
@@ -27,7 +27,6 @@ def test_create_project_positive(auth, API_key, driver):
         main.create_project_click_button()
 
     with allure.step("Количество проектов после создания"):
-        project_list_after = api.get_project_list(API_key)
         project_list_after = api.get_project_list(API_key)
 
     with allure.step("Название на карточке проекта"):
@@ -42,6 +41,121 @@ def test_create_project_positive(auth, API_key, driver):
 
     with allure.step("Удаление тестовых данных"):
         main.delete_project(title)
+
+    with allure.step("Количество проектов после удаления"):
+        project_list_del = api.get_project_list(API_key)
+
+    with allure.step("Проверка удаления"):
+        assert project_list_del == project_list_before
+
+
+@pytest.mark.ui
+@allure.title("Тестирование дублирования проектов")
+@allure.description("Тест проверяет дублирование проектов")
+@allure.feature("Работа с проектами")
+@allure.severity(allure.severity_level.NORMAL)
+def test_double_project(auth, driver, API_key) -> None:
+    """
+    Тест проверяет дублирование проектов.
+    """
+    api = apiYouGile()
+    main = MainPage(driver)
+    title = "New Project"
+
+    with allure.step("Количество проектов до начала теста"):
+        project_list_before = api.get_project_list(API_key)
+
+    with allure.step("Создание нового проекта через UI"):
+        main.create_project_click()
+        main.create_project_title(title)
+        main.create_project_click_button()
+
+    with allure.step("Количество проектов после создания"):
+        project_list_after = api.get_project_list(API_key)
+
+    with allure.step("Количество проектов увеличилось на 1"):
+        assert project_list_after - project_list_before == 1
+
+    with allure.step("Название на карточке проекта"):
+        project_card = main.proj_card()
+
+    with allure.step("Проверка совпадения названия на карточке с заданным"):
+        assert title in project_card
+        (f"Элемент не содержит текст {title}. Текущий текст: {project_card}")
+
+    with allure.step("Дублирование проекта"):
+        main.double_project(title)
+
+    with allure.step("Количество проектов после создания и дублирования"):
+        project_list_double = api.get_project_list(API_key)
+
+    with allure.step("Количество проектов увеличилось на 2"):
+        assert project_list_double - project_list_before == 2
+
+    with allure.step("Название на карточке дублированного проекта"):
+        double_project_card = main.proj_card()
+
+    with allure.step("Проверка совпадения названия на карточке с заданным"):
+        assert double_project_card == f"{project_card} (2)"
+
+    with allure.step("Удаление тестовых данных"):
+        main.delete_project(title)
+
+    with allure.step("Количество проектов после удаления"):
+        project_list_del = api.get_project_list(API_key)
+
+    with allure.step("Проверка удаления"):
+        assert project_list_del == project_list_before
+
+
+@pytest.mark.ui
+@allure.title("Тестирование переименования проектов")
+@allure.description("Тест проверяет переименование проектов")
+@allure.feature("Работа с проектами")
+@allure.severity(allure.severity_level.CRITICAL)
+def test_edit_project(auth, driver, API_key):
+    """
+    Тест проверяет возможность переименования проектов.
+    """
+    api = apiYouGile()
+    main = MainPage(driver)
+    title = "New Project"
+    new_title = "Newest Project"
+
+    with allure.step("Количество проектов до начала теста"):
+        project_list_before = api.get_project_list(API_key)
+
+    with allure.step("Создание нового проекта через UI"):
+        main.create_project_click()
+        main.create_project_title(title)
+        main.create_project_click_button()
+
+    with allure.step("Количество проектов после создания"):
+        project_list_after = api.get_project_list(API_key)
+
+    with allure.step("Количество проектов увеличилось на 1"):
+        assert project_list_after - project_list_before == 1
+
+    with allure.step("Название на карточке проекта"):
+        project_card = main.proj_card()
+
+    with allure.step("Проверка совпадения названия на карточке с заданным"):
+        assert title in project_card
+        (f"Элемент не содержит текст {title}. Текущий текст: {project_card}")
+
+    with allure.step("Переименование проекта"):
+        main.edit_project(title, new_title)
+
+    with allure.step("Название на карточке проекта"):
+        project_card = main.proj_card()
+
+    with allure.step("Проверка совпадения названия на карточке с заданным"):
+        assert new_title in project_card
+        (f"Элемент не содержит текст {new_title}.Текущий текст: {project_card}"
+         )
+
+    with allure.step("Удаление тестовых данных"):
+        main.delete_project(title, new_title)
 
     with allure.step("Количество проектов после удаления"):
         project_list_del = api.get_project_list(API_key)
@@ -69,104 +183,5 @@ def test_create_project_negative(auth, driver) -> None:
     with allure.step("Проверка неактивности кнопки"):
         assert button is False
 
-
-@pytest.mark.ui
-@allure.title("Тестирование дублирования проектов")
-@allure.description("Тест проверяет дублирование проектов")
-@allure.feature("Работа с проектами")
-@allure.severity(allure.severity_level.NORMAL)
-def test_double_project(auth, driver, API_key) -> None:
-    """
-    Тест проверяет дублирование проектов.
-    """
-    api = apiYouGile()
-    main = MainPage(driver)
-    title = "New Project"
-
-    with allure.step("Количество проектов до начала теста"):
-        project_list_before = api.get_project_list(API_key)
-
-    with allure.step("Создание нового проекта через UI"):
-        main.create_project_click()
-        main.create_project_title(title)
-        main.create_project_click_button()
-    sleep(0.5)
-    with allure.step("Название на карточке проекта"):
-        project_card = main.proj_card()
-
-    with allure.step("Проверка совпадения названия на карточке с заданным"):
-        assert title in project_card
-        (f"Элемент не содержит текст {title}. Текущий текст: {project_card}")
-
-    with allure.step("Дублирование проекта"):
-        main.double_project(title)
-
-    with allure.step("Количество проектов после создания и дублирования"):
-        project_list_after = api.get_project_list(API_key)
-        project_list_after = api.get_project_list(API_key)
-
-    with allure.step("Название на карточке дублированного проекта"):
-        double_project_card = main.proj_card()
-
-    with allure.step("Проверка совпадения названия на карточке с заданным"):
-        assert double_project_card == f"{project_card} (2)"
-
-    with allure.step("Количество проектов увеличилось на 2"):
-        assert project_list_after - project_list_before == 2
-
-    with allure.step("Удаление тестовых данных"):
-        main.delete_project(title)
-    sleep(5)
-
-
-@pytest.mark.ui
-@allure.title("Тестирование переименования проектов")
-@allure.description("Тест проверяет переименование проектов")
-@allure.feature("Работа с проектами")
-@allure.severity(allure.severity_level.CRITICAL)
-def test_edit_project(auth, driver, API_key):
-    """
-    Тест проверяет возможность переименования проектов.
-    """
-    api = apiYouGile()
-    main = MainPage(driver)
-    title = "New Project"
-    new_title = "Newest Project"
-
-    with allure.step("Количество проектов до начала теста"):
-        project_list_before = api.get_project_list(API_key)
-
-    with allure.step("Создание нового проекта через UI"):
-        main.create_project_click()
-        main.create_project_title(title)
-        main.create_project_click_button()
-
-    with allure.step("Количество проектов после создания"):
-        project_list_after = api.get_project_list(API_key)
-        project_list_after = api.get_project_list(API_key)
-
-    with allure.step("Количество проектов увеличилось на 1"):
-        assert project_list_after - project_list_before == 1
-    # sleep(5)
-    with allure.step("Название на карточке проекта"):
-        project_card = main.proj_card()
-
-    with allure.step("Проверка совпадения названия на карточке с заданным"):
-        assert title in project_card
-        (f"Элемент не содержит текст {title}. Текущий текст: {project_card}")
-    # sleep(5)
-    with allure.step("Переименование проекта"):
-        main.edit_project(title, new_title)
-
-    with allure.step("Название на карточке проекта"):
-        project_card = main.proj_card()
-
-    with allure.step("Проверка совпадения названия на карточке с заданным"):
-        assert new_title in project_card
-        (f"Элемент не содержит текст {new_title}.Текущий текст: {project_card}"
-         )
-
-    with allure.step("Удаление тестовых данных"):
-        main.delete_project(title, new_title)
-
-    sleep(5)
+    with allure.step("Нажатие кнопки отмены"):
+        main.create_cancel_click()

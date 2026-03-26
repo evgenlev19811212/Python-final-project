@@ -94,6 +94,14 @@ class MainPage:
         except Exception:
             return False
 
+    @allure.step("Нажатие кнопки отмены добавления проекта")
+    def create_cancel_click(self) -> None:
+        """
+        Нажимает кнопку отмены добавления.
+        """
+        self.wait.until(EC.element_to_be_clickable((
+            By.XPATH, "//div[text()='Отмена']"))).click()
+
     @allure.step("Нажатие кнопки добавления проекта")
     def create_project_click_button(self) -> None:
         """
