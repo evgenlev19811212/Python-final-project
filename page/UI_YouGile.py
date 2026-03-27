@@ -121,7 +121,12 @@ class MainPage:
             By.CSS_SELECTOR, '[data-testid="project-title"]'))).text
         return proj_card
 
+    @allure.step("Количество проектов")
     def len_proj_list(self) -> int:
+        """
+        Возвращает количество проектов.
+        :return len(proj_list): int - количество проектов
+        """
         proj_list = self.wait.until(EC.visibility_of_all_elements_located(
             (By.CSS_SELECTOR, '[data-testid="project-title"]')))
         return len(proj_list)
