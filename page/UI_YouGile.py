@@ -54,7 +54,7 @@ class MainPage:
         :param driver: webdriver — объект драйвера Selenium.
         """
         self.driver = driver
-        self.wait = WebDriverWait(self.driver, 30)
+        self.wait = WebDriverWait(self.driver, 1)
 
     @allure.step("Нажатие плюсика создания проекта")
     def create_project_click(self) -> None:
@@ -193,3 +193,22 @@ class MainPage:
                 self.wait.until(EC.element_to_be_clickable(
                         (By.XPATH, "//span[text()='Ok']"))).click()
                 break
+
+    @allure.step("Очистка тестового пространства")
+    def clear_test_space(self) -> None:
+        """
+        Удаляет все карточки проектов без привязки к названию.
+        """
+        try:
+            card = self.wait.until(EC.presence_of_all_elements_located(
+                (By.CSS_SELECTOR, '[data-testid="project-title"]')))
+            for card in card:
+                css = '[class="flex-none h-16 w-16 flex items-center justify-center"]' # noqa
+                self.driver.find_element(By.CSS_SELECTOR, css).click()
+                self.wait.until(EC.element_to_be_clickable(
+                    (By.XPATH, "//div[text()='Удалить']"))).click()
+                css = '[class="flex bg-action-attention-default text-invert px-16 py-12 plain-text-semibold hover:bg-action-attention-hover active:bg-action-attention-pressed rounded-8 w-fit cursor-pointer select-none"]' # noqa
+                self.wait.until(EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, css))).click()
+        except Exception:
+            return None

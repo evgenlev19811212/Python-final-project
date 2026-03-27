@@ -2,6 +2,7 @@ import pytest
 from page.API_YouGile import apiYouGile
 from selenium import webdriver
 from page.UI_YouGile import AuthPage
+from page.UI_YouGile import MainPage
 import allure
 
 
@@ -14,8 +15,11 @@ def API_key() -> str:
     :return API_key: str - ключ авторизации
     """
     api = apiYouGile()
-    IdCompany = api.get_companies()
-    API_key = api.get_keys(IdCompany)
+
+    with allure.step("Получить ключ авторизации"):
+        IdCompany = api.get_companies()
+        API_key = api.get_keys(IdCompany)
+
     return API_key
 
 
@@ -26,7 +30,7 @@ def driver():
     """
     with allure.step("Открыть и настроить браузер"):
         driver = webdriver.Chrome()
-        driver.implicitly_wait(30)
+        driver.implicitly_wait(5)
         driver.maximize_window()
         yield driver
 
@@ -41,5 +45,18 @@ def auth(driver) -> None:
     всю тестовую сессию.
     """
     auth = AuthPage(driver)
-    auth.send_login()
-    auth.click_login()
+
+    with allure.step("Авторизоваться"):
+        auth.send_login()
+        auth.click_login()
+
+
+@pytest.fixture()
+def clear(driver) -> None:
+    """
+    Удаляет все карточки проектов перед началом теста.
+    """
+    main = MainPage(driver)
+
+    with allure.step("Очистить тестовое пространство"):
+        main.clear_test_space()
