@@ -52,11 +52,16 @@ def auth(driver) -> None:
 
 
 @pytest.fixture()
-def clear(driver) -> None:
+def clear(driver, API_key) -> None:
     """
     Удаляет все карточки проектов перед началом теста.
     """
+    api = apiYouGile()
     main = MainPage(driver)
 
-    with allure.step("Очистить тестовое пространство"):
-        main.clear_test_space()
+    with allure.step("Количество проектов"):
+        project_list = api.get_project_list(API_key)
+
+    if project_list != 0:
+        with allure.step("Очистить тестовое пространство"):
+            main.clear_test_space()
